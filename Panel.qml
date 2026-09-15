@@ -16,6 +16,7 @@ Panel {
 
   readonly property color foreground: bar ? bar.foreground : Color.foreground
   readonly property color urgent: bar ? bar.urgent : Color.urgent
+  readonly property color accent: bar && bar.accent ? bar.accent : Color.accent
   readonly property color dim: Qt.darker(foreground, 1.55)
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
 
@@ -60,13 +61,14 @@ Panel {
   }
 
   readonly property string callSubtitle: {
-    if (discord.rpc.deaf) return "Deafened"
-    if (discord.micMuted) return "Muted"
-    if (pingQuality === "poor" || pingQuality === "fair") return "Unstable · " + discord.rpc.ping + " ms"
+    var prefix = discord.sharingScreen ? "Sharing screen · " : ""
+    if (discord.rpc.deaf) return prefix + "Deafened"
+    if (discord.micMuted) return prefix + "Muted"
+    if (pingQuality === "poor" || pingQuality === "fair") return prefix + "Unstable · " + discord.rpc.ping + " ms"
     var talking = discord.rpc.speaking
-    if (talking.length === 1) return talking[0] + " is talking"
-    if (talking.length > 1) return talking.join(", ") + " are talking"
-    return "Connected"
+    if (talking.length === 1) return prefix + talking[0] + " is talking"
+    if (talking.length > 1) return prefix + talking.join(", ") + " are talking"
+    return discord.sharingScreen ? "Sharing screen" : "Connected"
   }
   // The meter reads low at speech level, so scale it up to fill the bar.
   readonly property real peakScale: 1.6
@@ -84,6 +86,7 @@ Panel {
     if (discord.installed) list.push({ kind: "power" })
     if (callControls || micRowVisible) list.push({ kind: "mic" })
     if (callControls) list.push({ kind: "deafen" })
+    if (discord.sharingScreen) list.push({ kind: "stopShare" })
     if (callControls) list.push({ kind: "hangup" })
     if (callControls) list.push({ kind: "gain" })
     if (discord.hasPlayback) list.push({ kind: "volume" })
@@ -132,6 +135,7 @@ Panel {
     case "power": discord.running ? discord.quit() : discord.launch(); break
     case "mic": discord.toggleMic(); break
     case "deafen": discord.toggleDeaf(); break
+    case "stopShare": discord.stopScreenShare(); root.close(); break
     case "hangup": discord.hangUp(); break
     case "volume": discord.toggleAppMute(); break
     case "window": discord.focusWindow(discord.windows[currentRow.windowIndex]); root.close(); break
@@ -256,7 +260,28 @@ Panel {
             width: Style.space(4)
             height: width
             radius: width / 2
-            color: discord.micLive ? root.barForeground : root.urgent
+            color: discord.micLive ? root.barForeground : "#e06c75"
+          }
+        }
+
+        // Screenshare indicator: screen badge at top-right
+        Rectangle {
+          visible: discord.sharingScreen
+          width: Style.space(7)
+          height: Style.space(6)
+          radius: Style.space(2)
+          color: root.bar ? root.bar.background : Color.background
+          anchors.right: barIcon.right
+          anchors.top: barIcon.top
+          anchors.rightMargin: -Style.space(3)
+          anchors.topMargin: -Style.space(2)
+
+          Rectangle {
+            anchors.centerIn: parent
+            width: Style.space(5)
+            height: Style.space(4)
+            radius: Style.space(1)
+            color: "#3b82f6"
           }
         }
       }
@@ -299,6 +324,7 @@ Panel {
         if (t === "o" || t === "O") { discord.open(); root.close() }
         else if (t === "m" || t === "M") discord.toggleMic()
         else if (t === "d" || t === "D") discord.toggleDeaf()
+        else if (t === "s" || t === "S") { discord.stopScreenShare(); root.close() }
         else if (t === "r" || t === "R") discord.refresh()
       }
 
@@ -708,6 +734,19 @@ Panel {
         tooltipText: discord.rpc.deaf ? "Undeafen" : "Deafen"
         foreground: discord.rpc.deaf ? root.urgent : root.foreground
         onClicked: discord.toggleDeaf()
+      }
+
+      CallButton {
+        visible: discord.sharingScreen
+        kind: "stopShare"
+        iconText: "󰍹"
+        tooltipText: "Stop screen share (Focus Discord)"
+        foreground: root.urgent
+        hoverColor: root.urgent
+        onClicked: {
+          discord.stopScreenShare()
+          root.close()
+        }
       }
 
       CallButton {
