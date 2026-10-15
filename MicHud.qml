@@ -37,7 +37,7 @@ PanelWindow {
   Item {
     id: pill
     readonly property bool hovered: dragArea.containsMouse || micMouse.containsMouse || shareMouse.containsMouse
-    opacity: root.presence * (hovered ? 0.97 : 0.65)
+    opacity: root.presence * (hovered ? 0.97 : 0.87)
     Behavior on opacity {
       NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
     }
@@ -61,7 +61,7 @@ PanelWindow {
       color: "transparent"
       border.color: root.micLive ? "#22c55e" : (root.sharingScreen ? "#3b82f6" : "#e06c75")
       border.width: Style.space(1)
-      opacity: (pill.hovered ? 0.60 : 0.18) + 0.28 * Math.min(1.0, root.audioPeak * 2.0)
+      opacity: (pill.hovered ? 0.60 : 0.25) + 0.28 * Math.min(1.0, root.audioPeak * 2.0)
       Behavior on opacity {
         NumberAnimation { duration: 150 }
       }
@@ -79,12 +79,12 @@ PanelWindow {
       id: capsuleBg
       anchors.fill: parent
       radius: height / 2
-      color: Util.alpha("#06090e", pill.hovered ? 0.97 : 0.60)
+      color: Util.alpha("#06090e", pill.hovered ? 0.97 : 0.87)
       border.color: root.micLive
-        ? Util.alpha("#22c55e", pill.hovered ? 0.90 : 0.45)
+        ? Util.alpha("#22c55e", pill.hovered ? 0.92 : 0.68)
         : (root.sharingScreen
-          ? Util.alpha("#3b82f6", pill.hovered ? 0.90 : 0.45)
-          : Util.alpha("#e06c75", pill.hovered ? 0.90 : 0.45))
+          ? Util.alpha("#3b82f6", pill.hovered ? 0.92 : 0.68)
+          : Util.alpha("#e06c75", pill.hovered ? 0.92 : 0.68))
       border.width: Style.space(1.5)
 
       Behavior on color {
