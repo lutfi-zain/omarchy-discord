@@ -58,7 +58,7 @@ PanelWindow {
       color: "transparent"
       border.color: root.micLive ? "#22c55e" : (root.sharingScreen ? "#3b82f6" : "#e06c75")
       border.width: Style.space(1)
-      opacity: 0.30 + 0.40 * Math.min(1.0, root.audioPeak * 2.0)
+      opacity: 0.18 + 0.28 * Math.min(1.0, root.audioPeak * 2.0)
 
       SequentialAnimation on scale {
         loops: Animation.Infinite
@@ -73,8 +73,8 @@ PanelWindow {
       id: capsuleBg
       anchors.fill: parent
       radius: height / 2
-      color: Util.alpha("#06090e", 0.92)
-      border.color: root.micLive ? Util.alpha("#22c55e", 0.70) : (root.sharingScreen ? Util.alpha("#3b82f6", 0.70) : Util.alpha("#e06c75", 0.70))
+      color: Util.alpha("#06090e", 0.60)
+      border.color: root.micLive ? Util.alpha("#22c55e", 0.45) : (root.sharingScreen ? Util.alpha("#3b82f6", 0.45) : Util.alpha("#e06c75", 0.45))
       border.width: Style.space(1.5)
 
       MouseArea {
@@ -118,8 +118,8 @@ PanelWindow {
         height: width
         radius: width / 2
         color: root.micLive
-          ? (micMouse.containsMouse ? "#15803d" : "#22c55e")
-          : (micMouse.containsMouse ? "#b91c1c" : "#e06c75")
+          ? (micMouse.containsMouse ? Util.alpha("#15803d", 0.88) : Util.alpha("#22c55e", 0.72))
+          : (micMouse.containsMouse ? Util.alpha("#b91c1c", 0.88) : Util.alpha("#e06c75", 0.72))
         anchors.verticalCenter: parent.verticalCenter
         scale: 1.0 + (root.micLive ? 0.15 * Math.min(1.0, root.audioPeak * 2.0) : 0)
 
@@ -208,7 +208,7 @@ PanelWindow {
         width: shareContent.implicitWidth + Style.space(14)
         height: Style.space(28)
         radius: height / 2
-        color: shareMouse.containsMouse ? "#1d4ed8" : "#2563eb"
+        color: shareMouse.containsMouse ? Util.alpha("#1d4ed8", 0.88) : Util.alpha("#2563eb", 0.72)
         anchors.verticalCenter: parent.verticalCenter
 
         Row {
