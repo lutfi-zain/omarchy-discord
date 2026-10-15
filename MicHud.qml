@@ -36,11 +36,14 @@ PanelWindow {
 
   Item {
     id: pill
-    opacity: root.presence
+    readonly property bool hovered: dragArea.containsMouse || micMouse.containsMouse || shareMouse.containsMouse
+    opacity: root.presence * (hovered ? 0.97 : 0.65)
+    Behavior on opacity {
+      NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
+    }
     width: contentRow.implicitWidth + Style.space(26)
     height: Style.space(48)
     scale: 0.90 + 0.10 * root.presence
-
     // Default centered at bottom, custom x/y once dragged
     property bool moved: false
     property real customX: 0
@@ -58,7 +61,10 @@ PanelWindow {
       color: "transparent"
       border.color: root.micLive ? "#22c55e" : (root.sharingScreen ? "#3b82f6" : "#e06c75")
       border.width: Style.space(1)
-      opacity: 0.18 + 0.28 * Math.min(1.0, root.audioPeak * 2.0)
+      opacity: (pill.hovered ? 0.60 : 0.18) + 0.28 * Math.min(1.0, root.audioPeak * 2.0)
+      Behavior on opacity {
+        NumberAnimation { duration: 150 }
+      }
 
       SequentialAnimation on scale {
         loops: Animation.Infinite
@@ -73,9 +79,20 @@ PanelWindow {
       id: capsuleBg
       anchors.fill: parent
       radius: height / 2
-      color: Util.alpha("#06090e", 0.60)
-      border.color: root.micLive ? Util.alpha("#22c55e", 0.45) : (root.sharingScreen ? Util.alpha("#3b82f6", 0.45) : Util.alpha("#e06c75", 0.45))
+      color: Util.alpha("#06090e", pill.hovered ? 0.97 : 0.60)
+      border.color: root.micLive
+        ? Util.alpha("#22c55e", pill.hovered ? 0.90 : 0.45)
+        : (root.sharingScreen
+          ? Util.alpha("#3b82f6", pill.hovered ? 0.90 : 0.45)
+          : Util.alpha("#e06c75", pill.hovered ? 0.90 : 0.45))
       border.width: Style.space(1.5)
+
+      Behavior on color {
+        ColorAnimation { duration: 150 }
+      }
+      Behavior on border.color {
+        ColorAnimation { duration: 150 }
+      }
 
       MouseArea {
         id: dragArea
@@ -83,6 +100,7 @@ PanelWindow {
         cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
         drag.target: pill
         drag.minimumX: Style.space(12)
+        hoverEnabled: true
         drag.maximumX: root.width - pill.width - Style.space(12)
         drag.minimumY: Style.space(12)
         drag.maximumY: root.height - pill.height - Style.space(12)
