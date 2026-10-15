@@ -180,9 +180,14 @@ Panel {
 
   MicHud {
     id: micHud
-    active: root.showMicHud && discord.inVoice && discord.micLive
+    active: root.showMicHud && discord.inVoice && (discord.micLive || discord.sharingScreen)
+    inVoice: discord.inVoice
+    micLive: discord.micLive
+    sharingScreen: discord.sharingScreen
     channel: discord.callChannel
     audioPeak: micPeak.peak
+    onToggleMicRequested: discord.toggleMic()
+    onStopShareRequested: discord.stopScreenShare()
   }
 
   // raise and mute are the two worth binding a key to.
@@ -221,8 +226,7 @@ Panel {
         inVoice: discord.inVoice,
         micLive: discord.micLive,
         micMuted: discord.micMuted,
-        hasMicControl: discord.hasMicControl,
-        voiceKnown: discord.voiceKnown,
+        sharingScreen: discord.sharingScreen,
         channel: discord.callChannel,
         hudActive: micHud.active,
         hudPresence: micHud.presence,
